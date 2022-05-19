@@ -44,6 +44,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 		.antMatchers(HttpMethod.GET, "/games").permitAll()
 		.antMatchers(HttpMethod.GET, "/categorias").permitAll()
 		.antMatchers(HttpMethod.POST, "/auth").permitAll()
+		.antMatchers(HttpMethod.POST, "/registrar").permitAll()
 		.anyRequest().authenticated()
 		.and()
 		.formLogin().defaultSuccessUrl("/games")

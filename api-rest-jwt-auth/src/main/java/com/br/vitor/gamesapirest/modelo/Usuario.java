@@ -2,6 +2,7 @@ package com.br.vitor.gamesapirest.modelo;
 
 import java.util.Collection;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,6 +20,7 @@ public class Usuario implements UserDetails{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Column(nullable = false, unique = true)
 	private String username;
 	
 	private String senha;
@@ -113,6 +115,7 @@ public class Usuario implements UserDetails{
 	public void setId(Long id) {
 		this.id = id;
 	}
+	
 	
 	
 	

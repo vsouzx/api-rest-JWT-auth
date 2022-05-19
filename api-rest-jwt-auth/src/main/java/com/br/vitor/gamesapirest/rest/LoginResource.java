@@ -4,40 +4,36 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.br.vitor.gamesapirest.form.TokenDto;
-import com.br.vitor.gamesapirest.form.UsuarioForm;
-import com.br.vitor.gamesapirest.security.TokenService;
+import com.br.vitor.gamesapirest.form.RegisterForm;
+import com.br.vitor.gamesapirest.modelo.Usuario;
+import com.br.vitor.gamesapirest.repository.UserRepository;
 
+@RestController
+@RequestMapping(value = "registrar")
 public class LoginResource {
 	
 	@Autowired
-	private AuthenticationManager authManager;
+	private UserRepository userRepository;
 	
-	@Autowired
-	private TokenService tokenService;
-	
-	@PostMapping("")
-	public ResponseEntity<TokenDto> cadastrar(@RequestBody @Valid UsuarioForm usuarioForm){
-		UsernamePasswordAuthenticationToken dadosLogin = usuarioForm.converter();
+	@PostMapping
+	public ResponseEntity<Usuario> cadastrar(@RequestBody @Valid RegisterForm registerForm, BindingResult result){
 		
-		try {
-			
-			Authentication auth = authManager.authenticate(dadosLogin);
-			
-			String token = tokenService.gerarToken(auth);
-			
-			return ResponseEntity.ok(new TokenDto(token, "Bearer"));
-		}
-			catch (AuthenticationException e) {
-			
-			return ResponseEntity.badRequest().build();
-		}
+		Usuario user = registerForm.converter();
+	
+		String senhaNaoCriptografada = user.getSenha();
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		String encodedPassword = encoder.encode(senhaNaoCriptografada);
+		user.setSenha(encodedPassword);
+		Usuario novo = userRepository.save(user);
+		
+		return ResponseEntity.ok(novo);
+		
 	}
 }
